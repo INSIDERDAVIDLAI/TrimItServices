@@ -25,20 +25,20 @@ public class URLShortenerController {
         this.qrCodeGeneratorService = qrCodeGeneratorService;
     }
 
-    @PostMapping("/shorten/{longURL}/{type}")
-    public String shortenURL(@PathVariable String longURL, @PathVariable String type) {
+    @PostMapping("/shorten/")
+    public String shortenURL(@RequestParam String longURL, @RequestParam String type) {
         ShortenService shortenService = getService(type);
         return shortenService.shortenURL(longURL);
     }
 
-    @GetMapping("/retrieve/{shortURL}/{type}")
-    public String getLongURL(@PathVariable String shortURL, @PathVariable String type) {
+    @GetMapping("/retrieve/")
+    public String getLongURL(@RequestParam String shortURL, @RequestParam String type) {
         ShortenService shortenService = getService(type);
         return shortenService.getLongURL(shortURL);
     }
 
-    @GetMapping("/generateQR/{url}")
-    public String generateQRCode(@PathVariable String url) throws WriterException, IOException {
+    @GetMapping("/generateQR/")
+    public String generateQRCode(@RequestParam String url) throws WriterException, IOException {
         return qrCodeGeneratorService.generateQRCode(url, 200, 200);
     }
 
