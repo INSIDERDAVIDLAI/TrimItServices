@@ -1,27 +1,49 @@
 package com.example.demo.service;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
+
+import static com.mongodb.client.model.Filters.eq;
 
 @Service
 public class HashShorteneService implements ShortenService {
-    private final Map<String, String> urlMap = new HashMap<>();
+
+    private final MongoCollection<Document> collection;
+
+    @Autowired
+    public HashShorteneService(MongoDatabase mongoDatabase) {
+        this.collection = mongoDatabase.getCollection("URLMapping");
+    }
 
     @Override
     public String shortenURL(String longURL) {
-        String hash = encode(longURL.hashCode()).substring(0, 7);
-        urlMap.put(hash, longURL);
-        return "http://tiny.url/" + hash;
+        // Check if the longURL already exists in the database
+        Document existingDoc = collection.find(eq("longURL", longURL)).first();
+        if (existingDoc != null) {
+            // Return the existing shortURL if the longURL already exists
+            return existingDoc.getString("shortURL");
+        }
+
+        // Generate a new shortURL if the longURL does not exist
+        String shortURL = "http://tiny.url/" + encode(longURL.hashCode()).substring(0, 7);
+        Document doc = new Document("longURL", longURL)
+                .append("shortURL", shortURL)
+                .append("type", "hash");
+        collection.insertOne(doc);
+        return shortURL;
     }
 
     @Override
     public String getLongURL(String shortURL) {
-        String hash = shortURL.replace("http://tiny.url/", "");
-        return urlMap.get(hash);
+        Document doc = collection.find(eq("shortURL", shortURL)).first();
+        return doc != null ? doc.getString("longURL") : null;
     }
 
     public String encode(long num) {

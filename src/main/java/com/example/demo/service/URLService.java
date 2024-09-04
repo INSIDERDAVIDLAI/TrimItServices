@@ -9,17 +9,23 @@ import org.springframework.stereotype.Service;
 import static com.mongodb.client.model.Filters.eq;
 
 @Service
-public class Base62ShortenService implements ShortenService {
+public class URLService {
 
     private final MongoCollection<Document> collection;
+    private final Base62ShortenService base62ShortenService;
 
     @Autowired
-    public Base62ShortenService(MongoDatabase mongoDatabase) {
+    public URLService(MongoDatabase mongoDatabase, Base62ShortenService base62ShortenService) {
         this.collection = mongoDatabase.getCollection("URLMapping");
+        this.base62ShortenService = base62ShortenService;
     }
 
-    @Override
-    public String shortenURL(String longURL) {
+    public String getLongURL(String shortURL) {
+        Document doc = collection.find(eq("shortURL", shortURL)).first();
+        return doc != null ? doc.getString("longURL") : null;
+    }
+
+    public String saveURLMapping(String longURL, String type) {
         // Check if the longURL already exists in the database
         Document existingDoc = collection.find(eq("longURL", longURL)).first();
         if (existingDoc != null) {
@@ -28,27 +34,11 @@ public class Base62ShortenService implements ShortenService {
         }
 
         // Generate a new shortURL if the longURL does not exist
-        String shortURL = "http://tiny.url/" + encode(System.currentTimeMillis());
+        String shortURL = base62ShortenService.shortenURL(longURL);
         Document doc = new Document("longURL", longURL)
                 .append("shortURL", shortURL)
-                .append("type", "base62to10");
+                .append("type", type);
         collection.insertOne(doc);
         return shortURL;
-    }
-
-    @Override
-    public String getLongURL(String shortURL) {
-        Document doc = collection.find(eq("shortURL", shortURL)).first();
-        return doc != null ? doc.getString("longURL") : null;
-    }
-
-    public String encode(long num) {
-        char[] map = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
-        StringBuilder shortURL = new StringBuilder();
-        while (num > 0) {
-            shortURL.append(map[(int) (num % 62)]);
-            num /= 62;
-        }
-        return shortURL.reverse().toString();
     }
 }
