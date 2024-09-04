@@ -18,10 +18,11 @@ public class URLRedirectController {
     public URLRedirectController(URLService urlService) {
         this.urlService = urlService;
     }
-
-    @GetMapping("/http://tiny.url/{shortURL}")
+    //Next step to delete tiny url from parameter
+    //Next step to consider how to handle if one link are shortened by two different methods and how to store it in db
+    @GetMapping("/r/{shortURL}")
     public void redirect(@PathVariable String shortURL, HttpServletResponse response) throws IOException {
-        String longURL = urlService.getLongURL(shortURL);
+        String longURL = urlService.getLongURL("http://tiny.url/" + shortURL);
         if (longURL != null) {
             response.sendRedirect(longURL);
         } else {
