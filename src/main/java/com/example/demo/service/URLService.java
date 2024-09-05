@@ -41,4 +41,8 @@ public class URLService {
         collection.insertOne(doc);
         return shortURL;
     }
+
+    public boolean existsByLongURL(String longURL) {
+        return collection.find(eq("longURL", longURL)).first() != null;
+    }
 }

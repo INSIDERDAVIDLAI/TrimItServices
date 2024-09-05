@@ -32,13 +32,17 @@ public class URLShortenerController {
         this.urlService = urlService;
     }
 
-    @PostMapping("/shorten/")
+    @PostMapping(value="/shorten/",consumes = "application/json")
     public String shortenURL(@RequestBody ShortenRequest request) {
-    ShortenService shortenService = getService(request.getType());
-    String shortURL = shortenService.shortenURL(request.getLongURL());
-    urlService.saveURLMapping(request.getLongURL(), shortURL);
-    return shortURL;
-}
+        ShortenService shortenService = getService(request.getType());
+        String shortURL = shortenService.shortenURL(request.getLongURL());
+        if (urlService.existsByLongURL(request.getLongURL())) {
+            return shortURL+"\n"+"This URL already exists in the database.";
+        }
+
+        urlService.saveURLMapping(request.getLongURL(), shortURL);
+        return shortURL;
+    }
 
     @GetMapping("/retrieve/")
     public String getLongURL(@RequestBody RetrieveRequest request) {
