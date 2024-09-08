@@ -1,10 +1,13 @@
 package com.example.demo.service;
 
+import com.google.zxing.WriterException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -13,11 +16,13 @@ public class URLService {
 
     private final MongoCollection<Document> collection;
     private final Base62ShortenService base62ShortenService;
+    private final QRCodeGeneratorService qrCodeGeneratorService;
 
     @Autowired
-    public URLService(MongoDatabase mongoDatabase, Base62ShortenService base62ShortenService) {
+    public URLService(MongoDatabase mongoDatabase, Base62ShortenService base62ShortenService, QRCodeGeneratorService qrCodeGeneratorService) {
         this.collection = mongoDatabase.getCollection("URLMapping");
         this.base62ShortenService = base62ShortenService;
+        this.qrCodeGeneratorService = qrCodeGeneratorService;
     }
 
     public String getLongURL(String shortURL) {
@@ -25,7 +30,7 @@ public class URLService {
         return doc != null ? doc.getString("longURL") : null;
     }
 
-    public String saveURLMapping(String longURL, String type) {
+    public String saveURLMapping(String longURL, String type) throws IOException, WriterException {
         // Check if the longURL already exists in the database
         Document existingDoc = collection.find(eq("longURL", longURL)).first();
         if (existingDoc != null) {
@@ -35,10 +40,21 @@ public class URLService {
 
         // Generate a new shortURL if the longURL does not exist
         String shortURL = base62ShortenService.shortenURL(longURL);
+
+        // Generate QR code
+        String qrCodeBase64 = qrCodeGeneratorService.generateQRCode(longURL, 200, 200);
+
+        // Save longURL, shortURL, and qrCode to the URLMapping collection
         Document doc = new Document("longURL", longURL)
                 .append("shortURL", shortURL)
+                .append("qrCode", qrCodeBase64)
                 .append("type", type);
         collection.insertOne(doc);
+
         return shortURL;
+    }
+
+    public boolean existsByLongURL(String longURL) {
+        return collection.find(eq("longURL", longURL)).first() != null;
     }
 }

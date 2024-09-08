@@ -20,4 +20,6 @@ dependencies {
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
     implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'
     implementation 'org.mongodb:mongodb-driver-sync:5.1.2'
+    //implementation 'org.springframework.boot:spring-boot-starter-security'
+    //implementation 'org.springframework.security:spring-security-crypto'
 }
