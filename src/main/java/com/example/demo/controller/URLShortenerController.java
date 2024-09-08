@@ -1,8 +1,9 @@
 package com.example.demo.controller;
 
+
 import com.example.demo.dto.ShortenRequest;
 import com.example.demo.dto.RetrieveRequest;
-import com.example.demo.dto.QRCodeRequest;
+import com.example.demo.service.QRCodeService;
 import com.example.demo.service.Base62ShortenService;
 import com.example.demo.service.HashShorteneService;
 import com.example.demo.service.QRCodeGeneratorService;
@@ -19,25 +20,26 @@ public class URLShortenerController {
 
     private final Base62ShortenService base62ShortenService;
     private final HashShorteneService hashShorteneService;
-    private final QRCodeGeneratorService qrCodeGeneratorService;
     private final URLService urlService;
+
 
     public URLShortenerController(Base62ShortenService base62ShortenService,
                                   HashShorteneService hashShorteneService,
                                   QRCodeGeneratorService qrCodeGeneratorService,
-                                  URLService urlService) {
+                                  URLService urlService,
+                                  QRCodeService qrCodeService) {
         this.base62ShortenService = base62ShortenService;
         this.hashShorteneService = hashShorteneService;
-        this.qrCodeGeneratorService = qrCodeGeneratorService;
         this.urlService = urlService;
+
     }
 
-    @PostMapping(value="/shorten/",consumes = "application/json")
-    public String shortenURL(@RequestBody ShortenRequest request) {
+    @PostMapping(value="/shorten/", consumes = "application/json")
+    public String shortenURL(@RequestBody ShortenRequest request) throws IOException, WriterException {
         ShortenService shortenService = getService(request.getType());
         String shortURL = shortenService.shortenURL(request.getLongURL());
         if (urlService.existsByLongURL(request.getLongURL())) {
-            return shortURL+"\n"+"This URL already exists in the database.";
+            return shortURL + "\n" + "This URL already exists in the database.";
         }
 
         urlService.saveURLMapping(request.getLongURL(), shortURL);
@@ -49,10 +51,6 @@ public class URLShortenerController {
         return urlService.getLongURL(request.getShortURL());
     }
 
-    @GetMapping("/generateQR/")
-    public String generateQRCode(@RequestBody QRCodeRequest request) throws WriterException, IOException {
-        return qrCodeGeneratorService.generateQRCode(request.getUrl(), 200, 200);
-    }
 
     private ShortenService getService(String type) {
         return switch (type) {
