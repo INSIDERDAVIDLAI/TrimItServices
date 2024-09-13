@@ -10,6 +10,7 @@ import com.example.demo.service.QRCodeGeneratorService;
 import com.example.demo.service.ShortenService;
 import com.example.demo.service.URLService;
 import com.google.zxing.WriterException;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -35,14 +36,15 @@ public class URLShortenerController {
     }
 
     @PostMapping(value="/shorten/", consumes = "application/json")
-    public String shortenURL(@RequestBody ShortenRequest request) throws IOException, WriterException {
+    public String shortenURL(@RequestBody ShortenRequest request, Authentication authentication) throws IOException, WriterException {
         ShortenService shortenService = getService(request.getType());
         String shortURL = shortenService.shortenURL(request.getLongURL());
+        String username = authentication.getName();
         if (urlService.existsByLongURL(request.getLongURL())) {
             return shortURL + "\n" + "This URL already exists in the database.";
         }
 
-        urlService.saveURLMapping(request.getLongURL(), shortURL);
+        urlService.saveURLMapping(request.getLongURL(), shortURL,username);
         return shortURL;
     }
 

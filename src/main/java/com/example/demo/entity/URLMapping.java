@@ -11,6 +11,7 @@ public class URLMapping {
     private String shortURL;
     private String longURL;
     private String type;
+    private String generateBy;
 
     // Getters and Setters
 

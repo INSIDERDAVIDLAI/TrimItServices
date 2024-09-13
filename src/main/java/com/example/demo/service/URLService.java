@@ -30,12 +30,13 @@ public class URLService {
         return doc != null ? doc.getString("longURL") : null;
     }
 
-    public String saveURLMapping(String longURL, String type) throws IOException, WriterException {
+    public void saveURLMapping(String longURL, String type, String generatedBy) throws IOException, WriterException {
         // Check if the longURL already exists in the database
         Document existingDoc = collection.find(eq("longURL", longURL)).first();
         if (existingDoc != null) {
             // Return the existing shortURL if the longURL already exists
-            return existingDoc.getString("shortURL");
+            existingDoc.getString("shortURL");
+            return;
         }
 
         // Generate a new shortURL if the longURL does not exist
@@ -44,14 +45,14 @@ public class URLService {
         // Generate QR code
         String qrCodeBase64 = qrCodeGeneratorService.generateQRCode(longURL, 200, 200);
 
-        // Save longURL, shortURL, and qrCode to the URLMapping collection
+        // Save longURL, shortURL, qrCode, type, and generatedBy to the URLMapping collection
         Document doc = new Document("longURL", longURL)
                 .append("shortURL", shortURL)
                 .append("qrCode", qrCodeBase64)
-                .append("type", type);
+                .append("type", type)
+                .append("generatedBy", generatedBy);
         collection.insertOne(doc);
 
-        return shortURL;
     }
 
     public boolean existsByLongURL(String longURL) {
