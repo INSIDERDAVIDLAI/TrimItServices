@@ -1,14 +1,10 @@
-package com.example.demo.model;
+package com.example.demo.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document(collection = "qrcodes")
 public class QRCodeMapping {
-    @Id
     private String id;
     private String url;
     private String qrCodeBase64;
+    private String generatedBy; // New field to store the user who generated the URL
 
     // Getters and Setters
     public String getId() {
@@ -33,5 +29,13 @@ public class QRCodeMapping {
 
     public void setQrCodeBase64(String qrCodeBase64) {
         this.qrCodeBase64 = qrCodeBase64;
+    }
+
+    public String getGeneratedBy() {
+        return generatedBy;
+    }
+
+    public void setGeneratedBy(String generatedBy) {
+        this.generatedBy = generatedBy;
     }
 }
