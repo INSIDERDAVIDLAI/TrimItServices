@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -21,9 +22,11 @@ public class QRCodeService {
     private static final Logger logger = LoggerFactory.getLogger(QRCodeService.class);
     private final MongoCollection<Document> qrCodeCollection;
 
+
     @Autowired
     public QRCodeService(MongoDatabase mongoDatabase) {
         this.qrCodeCollection = mongoDatabase.getCollection("QRCodeMapping");
+
     }
 
     public boolean existsByLongURL(String longURL) {
@@ -62,6 +65,8 @@ public class QRCodeService {
             logger.error("Error deleting QR code for longURL: {}", longURL, e);
         }
     }
+
+
 
     public List<QRCodeMapping> getQRCodeByUser(String generatedBy) {
         List<QRCodeMapping> qrCodeList = new ArrayList<>();

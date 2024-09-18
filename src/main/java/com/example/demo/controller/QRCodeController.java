@@ -7,7 +7,8 @@ import com.example.demo.service.QRCodeService;
 import com.google.zxing.WriterException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
-
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,5 +47,6 @@ public class QRCodeController {
         String username = authentication.getName();
         return qrCodeService.getQRCodeByUser(username);
     }
+
 
 }

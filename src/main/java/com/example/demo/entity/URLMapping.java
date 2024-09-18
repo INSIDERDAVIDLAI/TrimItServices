@@ -46,4 +46,12 @@ public class URLMapping {
     public void setType(String type) {
         this.type = type;
     }
+
+    public String getGenerateBy() {
+        return generateBy;
+    }
+
+    public void setGenerateBy(String generateBy) {
+        this.generateBy = generateBy;
+    }
 }
