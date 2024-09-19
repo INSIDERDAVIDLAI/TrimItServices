@@ -58,11 +58,11 @@ public class QRCodeService {
         return null;
     }
 
-    public void deleteQRCode(String longURL) {
+    public void deleteQRCode(String id) {
         try {
-            qrCodeCollection.deleteOne(eq("longURL", longURL));
+            qrCodeCollection.deleteOne(eq("_id", new org.bson.types.ObjectId(id)));
         } catch (MongoException e) {
-            logger.error("Error deleting QR code for longURL: {}", longURL, e);
+            logger.error("Error deleting QR code with id: {}", id, e);
         }
     }
 
