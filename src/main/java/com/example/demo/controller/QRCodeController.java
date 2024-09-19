@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/qr")
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class QRCodeController {
 
     private final QRCodeGeneratorService qrCodeGeneratorService;
@@ -46,6 +47,12 @@ public class QRCodeController {
     public List<QRCodeMapping> getMyQRCode(Authentication authentication) {
         String username = authentication.getName();
         return qrCodeService.getQRCodeByUser(username);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteQRCode(@PathVariable String id) {
+        qrCodeService.deleteQRCode(id);
+        return ResponseEntity.noContent().build();
     }
 
 
