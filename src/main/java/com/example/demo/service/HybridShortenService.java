@@ -6,8 +6,4 @@ public class HybridShortenService implements ShortenService{
         return "";
     }
 
-    @Override
-    public String getLongURL(String shortURL) {
-        return "";
-    }
 }

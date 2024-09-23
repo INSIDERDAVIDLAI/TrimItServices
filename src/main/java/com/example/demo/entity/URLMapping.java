@@ -3,15 +3,16 @@ package com.example.demo.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "URLMapping")
+
 public class URLMapping {
 
-    @Id
+
     private String id;
     private String shortURL;
     private String longURL;
     private String type;
     private String generateBy;
+
 
     // Getters and Setters
 
@@ -47,11 +48,11 @@ public class URLMapping {
         this.type = type;
     }
 
-    public String getGenerateBy() {
+    public String getGeneratedBy() {
         return generateBy;
     }
 
-    public void setGenerateBy(String generateBy) {
+    public void setGeneratedBy(String generateBy) {
         this.generateBy = generateBy;
     }
 }

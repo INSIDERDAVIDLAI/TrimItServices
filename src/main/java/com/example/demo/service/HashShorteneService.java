@@ -15,35 +15,23 @@ import static com.mongodb.client.model.Filters.eq;
 @Service
 public class HashShorteneService implements ShortenService {
 
-    private final MongoCollection<Document> collection;
+    private final URLService urlService;
 
     @Autowired
-    public HashShorteneService(MongoDatabase mongoDatabase) {
-        this.collection = mongoDatabase.getCollection("URLMapping");
+    public HashShorteneService(URLService urlService) {
+        this.urlService = urlService;
     }
 
     @Override
     public String shortenURL(String longURL) {
         // Check if the longURL already exists in the database
-        Document existingDoc = collection.find(eq("longURL", longURL)).first();
-        if (existingDoc != null) {
-            // Return the existing shortURL if the longURL already exists
-            return existingDoc.getString("shortURL");
+        if (urlService.existsByLongURL(longURL)) {
+            return urlService.findByLongURL(longURL).getShortURL();
         }
 
         // Generate a new shortURL if the longURL does not exist
         String shortURL = "http://tiny.url/" + encode(longURL.hashCode()).substring(0, 7);
-        Document doc = new Document("longURL", longURL)
-                .append("shortURL", shortURL)
-                .append("type", "hash");
-        collection.insertOne(doc);
         return shortURL;
-    }
-
-    @Override
-    public String getLongURL(String shortURL) {
-        Document doc = collection.find(eq("shortURL", shortURL)).first();
-        return doc != null ? doc.getString("longURL") : null;
     }
 
     public String encode(long num) {
