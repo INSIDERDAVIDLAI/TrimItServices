@@ -22,7 +22,12 @@ public class URLRedirectController {
     //Next step to consider how to handle if one link are shortened by two different methods and how to store it in db
     @GetMapping("/r/{shortURL}")
     public void redirect(@PathVariable String shortURL, HttpServletResponse response) throws IOException {
+        long startTime = System.currentTimeMillis();
         String longURL = urlService.getLongURL("http://tiny.url/" + shortURL);
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+
+        System.out.println("Time taken: " + elapsedTime + " ms");
         if (longURL != null) {
             response.sendRedirect(longURL);
         } else {
