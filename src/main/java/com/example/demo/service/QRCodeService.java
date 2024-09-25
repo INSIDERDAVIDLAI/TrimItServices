@@ -60,6 +60,7 @@ public class QRCodeService {
                 qrCodeMapping.setUrl(doc.getString("longURL"));
                 qrCodeMapping.setQrCodeBase64(doc.getString("qrCode"));
                 redisTemplate.opsForValue().set(longURL, doc.getString("qrCode"), 1, TimeUnit.DAYS);
+                redisTemplate.opsForValue().set(doc.getString("qrCode"), longURL, 1, TimeUnit.DAYS);
                 return qrCodeMapping;
             }
         } catch (MongoException e) {

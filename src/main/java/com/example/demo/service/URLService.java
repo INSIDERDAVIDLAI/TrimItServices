@@ -59,6 +59,7 @@ public class URLService {
                     .append("shortURL", shortURL).append("generatedBy", generatedBy).append("type", type);
             urlCollection.insertOne(doc);
             redisTemplate.opsForValue().set(longURL, shortURL, 1, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set(shortURL, longURL, 1, TimeUnit.DAYS); // Short URL to Long URL
         }
     }
 
