@@ -27,13 +27,20 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+    @Autowired
+    private CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/register", "/api/users/login","/qr/generateQR/ ","/r/*","/url/shorten/*").permitAll()
+                .requestMatchers("/api/users/register", "/api/users/login","/qr/generateQR/ ","/r/*","/url/shorten/*", "/oauth2/**").permitAll()
                 .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .loginPage("/login")
+                .successHandler(customOAuth2SuccessHandler)
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
