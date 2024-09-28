@@ -5,6 +5,7 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -41,5 +42,13 @@ public class UserService {
             }
         }
         throw new IllegalArgumentException("Invalid username or password");
+    }
+    public boolean userExists(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
+    public String generateTokenForOAuth2User(OAuth2User oAuth2User) {
+        String username = oAuth2User.getAttribute("name"); // or "email" or any other attribute
+        return jwtUtil.generateToken(username);
     }
 }
